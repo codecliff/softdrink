@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+MimeType=application/x-jump
+Name=Softdrink
+Exec=softdrink %f 
+Icon=/usr/share/icons/softdrink.svg
+Categories=System;Utility;
+
+
