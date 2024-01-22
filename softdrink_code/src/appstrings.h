@@ -13,7 +13,7 @@
 * ****************************************************/
 
 // Version and help args
-    const char *versionStr = "0.9";
+    const char *versionStr = "0.9.5";
     const char *helpStr = "This applicaiton processes a .jump file \n\
     and opens the directory mentioned in it \n\
     Args availabe on console : \n\

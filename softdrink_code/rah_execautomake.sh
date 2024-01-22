@@ -2,10 +2,9 @@
 # apt-get install autoconf automake gcc
 
 # config.ac is already there , preferably as read-only. 
-# Therefore, following should work   
-
-autoreconf -i
-automake --add-missing
+# Therefore, just run following
+# autoreconf -i
+# automake --add-missing
 ./configure
 make
 

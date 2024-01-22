@@ -33,27 +33,32 @@ AUTOMAKE_OPTIONS = foreign
 # indents are very important for scoping 
 # use double $$ for shell variables
 # also, no comments inside the hook
-# target rah_os_dep_target is run conditional on os type
+# target rah_conditional_hook_install is run conditional on os type
 
 
 ###### Prepare  different stuff for Ubuntu vs others  #########
 # OS  (Ubuntu / Fedora Linux etc) 
 RAH_OS = $(shell grep -oP '^NAME.\"\K.*(?=\")' /etc/os-release)
 
+
+############################################
+# Conditional hooks for Installation 
+############################################
+
 # Demarcate diferent targets for different OSs
-rah_os_dep_target = $(if $(filter Ubuntu,$(RAH_OS)),rah_ubuntu_hook,rah_nonubuntu_hook)
+rah_os_dep_target_install = $(if $(filter Ubuntu,$(RAH_OS)),rah_ubuntu_hook_install,rah_nonubuntu_hook_install)
 
 
 
-# Define os-specific parts 
-rah_ubuntu_hook:
+# Define os-specific instalaltion  parts 
+rah_ubuntu_hook_install:
 	@echo "OS is Ubuntu" 
 	@echo "Installing custom mime  for all users"
 	sudo cp  ./assets/application-x-jump_ubuntu.xml /usr/share/mime/packages/application-x-jump.xml 
 	sudo update-icon-caches /usr/share/icons  
 	sudo update-icon-caches /usr/share/icons/hicolor 
 
-rah_nonubuntu_hook:
+rah_nonubuntu_hook_install:
 	@echo "OS Not Ubuntu" 
 	sudo cp  ./assets/application-x-jump_others.xml /usr/share/mime/packages/application-x-jump.xml 
 	@echo " Resorting to gtk-update-icon-cache \n" 
@@ -62,9 +67,33 @@ rah_nonubuntu_hook:
 
 
 # to call these parts, run this
-rah_conditional_hook: $(rah_os_dep_target)
+rah_conditional_hook_install: $(rah_os_dep_target_install)
 
+############################################
+# Conditional hooks for uninstallation 
+############################################
+
+rah_ubuntu_hook_uninstall:
+	@echo "OS is Ubuntu" 
+	@echo "UnInstalling custom mime  for all users"	
+	sudo update-icon-caches /usr/share/icons  
+	sudo update-icon-caches /usr/share/icons/hicolor 
+
+rah_nonubuntu_hook_uninstall:
+	@echo "OS Not Ubuntu" 	
+	sudo gtk-update-icon-cache -tf /usr/share/icons 
+	sudo gtk-update-icon-cache -tf /usr/share/icons/hicolor 
+
+# Demarcate diferent targets for different OSs
+rah_os_dep_target_uninstall = $(if $(filter Ubuntu,$(RAH_OS)),rah_ubuntu_hook_uninstall,rah_nonubuntu_hook_uninstall)
+# to call these parts, run this
+rah_conditional_hook_uninstall: $(rah_os_dep_target_uninstall)
+
+
+
+#########################################################
 ################## Installation ########################
+#########################################################
 install-exec-hook:
 	@echo "Going to  install custom mime and icons for all users"
 	@echo "Installing .desktop file  for all users"
@@ -80,7 +109,7 @@ install-exec-hook:
 	sudo cp ./assets/softdrink.svg /usr/share/icons/hicolor/scalable/mimetypes/application-x-jump.svg
 	sudo chmod 644 /usr/share/icons/hicolor/scalable/mimetypes/application-x-jump.svg	
 
-	$(MAKE) rah_conditional_hook
+	$(MAKE) rah_conditional_hook_install
 
 	@echo "Updating mime and desktop  databases etc:"
 	sudo update-mime-database /usr/share/mime
@@ -89,8 +118,9 @@ install-exec-hook:
 	@echo "Done with install-exec-hook"
 
 
-	
-################## Unisntallation ########################	
+##########################################################
+################## Unisntallation ########################
+##########################################################	
 uninstall-hook:
 
 	@echo "Removing custom mime  for all users"
@@ -110,12 +140,7 @@ uninstall-hook:
 	sudo update-mime-database /usr/share/mime
 	sudo update-desktop-database /usr/share/applications
 
-	sudo update-icon-caches /usr/share/icons
-	@if [ $$? -ne 0 ]; then \
-		@echo " Resorting to gtk-update-icon-cache \n;" \
-		sudo gtk-update-icon-cache -tf /usr/share/icons; \
-		sudo  gtk-update-icon-cache -tf /usr/share/icons/hicolor; \
-	fi
+	$(MAKE) rah_conditional_hook_uninstall
 
 	@echo "Done with uninstall-hook"
 
