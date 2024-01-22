@@ -44,15 +44,19 @@ jobs:
           ./configure
           make
           make dist
-          mkdir "./dist"
+          echo "pwd is"
+          pwd
+          mkdir "dist"
           cp *.tar.gz ./dist/
+          echo "pwd is"
+          pwd
                   
       
 
       - uses: actions/upload-artifact@v2 #3
         with:
           name: linuxartifacts 
-          path: "./dist/"
+          path: "./softdrink_code/dist/"
 
       - uses: marvinpinto/action-automatic-releases@latest # {{xyz}}varaibles not available in uses
         with:
@@ -61,7 +65,7 @@ jobs:
           prerelease: true
           title: "Build ${{ github.event.inputs.reltag }}" #same as inputs.reltag 
           files: |            
-            ./dist/*.tar.gz
+            ./softdrink_code/dist/*.*
             
      
           
