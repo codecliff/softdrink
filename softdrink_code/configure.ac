@@ -32,7 +32,7 @@ AC_PROG_CC
 AC_PROG_INSTALL
 
 
-# stop if t do not have gnome or nautilus
+# stop if we do not have gnome or nautilus
 # but only if invoked with make install 
 # which is given by value of MAKECMDGOALS
 
