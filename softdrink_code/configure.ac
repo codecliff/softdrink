@@ -31,12 +31,31 @@ AM_INIT_AUTOMAKE( [-Wall -Werror foreign] )
 AC_PROG_CC
 AC_PROG_INSTALL
 
-# abort configure if nautilus not installed.
+
+# stop if t do not have gnome or nautilus
+# but only if invoked with make install 
+# which is given by value of MAKECMDGOALS
+
 AC_CHECK_PROGS([GNOME], [gnome-shell])
-AS_IF([test -z "$GNOME"], [AC_MSG_ERROR([Gnome not found on this system, aborting])])
+AS_IF([test "$$MAKECMDGOALS" = "install"], [
+ AS_IF([test -z "$GNOME"], [
+    AC_MSG_ERROR([Gnome not found on this system, aborting])
+  ])
+])
 
 AC_CHECK_PROGS([NAUTILUS], [nautilus])
-AS_IF([test -z "$NAUTILUS"], [AC_MSG_ERROR([nautilus not found on this system, aborting ])])
+AS_IF([test "$$MAKECMDGOALS" = "install"], [
+ AS_IF([test -z "$NAUTILUS"], [
+    AC_MSG_ERROR([nautilus not found on this system, aborting])
+  ])
+])
+
+
+# AC_CHECK_PROGS([GNOME], [gnome-shell])
+# AS_IF([test -z "$GNOME"], [AC_MSG_ERROR([Gnome not found on this system, aborting])])
+
+# AC_CHECK_PROGS([NAUTILUS], [nautilus])
+# AS_IF([test -z "$NAUTILUS"], [AC_MSG_ERROR([nautilus not found on this system, aborting ])])
 
 # Checks for libraries.
 
