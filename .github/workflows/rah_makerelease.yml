@@ -1,0 +1,69 @@
+name: SoftdrinkMakeRelease
+
+# Creates a Release with oiutput of make dist
+# Generates tar.gz
+# Author: Rahul Singh
+# https://github.com/codecliff/softdrink
+# Runs manually, will prompt for release tag
+
+on:
+  #push:
+  #  branches: [ master ] 
+  #pull_request:
+  #  branches: [ master ]
+  workflow_dispatch:
+      inputs: #when run, ask user to input release tag
+        reltag:
+          description: "tag for release, eg v1.0.0_linux"
+          required: true
+          default: "latest"       
+          
+permissions:      
+    contents: write
+    pull-requests: write
+    repository-projects: write           
+ 
+  
+
+jobs:
+  build-withmake:
+    runs-on: ubuntu-20.04
+    env:
+      TAGNAME: ${{ inputs.reltag }}
+
+    steps:
+      - uses: actions/checkout@v2 #1     
+
+      - name: install dependencies #2
+        run: |
+          sudo apt update
+          sudo apt install autoconf libtool automake
+          cd softdrink_code
+          autoreconf -i
+          automake --add-missing
+          ./configure
+          make
+          make dist
+          mkdir "./dist"
+          cp *.tar.gz ./dist/
+                  
+      
+
+      - uses: actions/upload-artifact@v2 #3
+        with:
+          name: linuxartifacts 
+          path: "./dist/"
+
+      - uses: marvinpinto/action-automatic-releases@latest # {{xyz}}varaibles not available in uses
+        with:
+          repo_token: "${{ secrets.GITHUB_TOKEN }}"          
+          automatic_release_tag: "${{ inputs.reltag }}" 
+          prerelease: true
+          title: "Build ${{ github.event.inputs.reltag }}" #same as inputs.reltag 
+          files: |            
+            ./dist/*.tar.gz
+            
+     
+          
+
+          
